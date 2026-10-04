@@ -75,3 +75,24 @@ WDTはデバッガ停止中も動作する設定。ブレークポイントで�
 | `tusb_config.h` | TinyUSBの構成 |
 
 上記ソースは`Hid_blinker_Pico/`内にある。Python側の操作クラスは未実装。
+
+## Pythonから操作する
+
+PC側に`hidapi`をインストールする。
+
+```powershell
+python -m pip install hidapi
+```
+
+接続確認と操作は、リポジトリ直下の`pico_led.py`から行う。
+
+```powershell
+python pico_led.py --list
+python pico_led.py status 0
+python pico_led.py on 0
+python pico_led.py off 0
+python pico_led.py blink 1 500 500
+python pico_led.py all-off
+```
+
+`0`は内蔵LED、`1`～`4`は外付けLEDです。複数台を接続した場合は、`--list`で表示された`PICOLED-...`を`--serial`に指定します。

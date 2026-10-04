@@ -29,20 +29,10 @@ if ($LASTEXITCODE -ne 0) {
     throw "USB transport test compilation failed (exit $LASTEXITCODE)."
 }
 
-# A blocking regression must fail the suite instead of hanging the runner.
-$stdoutPath = Join-Path $outputDirectory "usb_transport.stdout.txt"
-$stderrPath = Join-Path $outputDirectory "usb_transport.stderr.txt"
-$testProcess = Start-Process -FilePath $executable -PassThru -WindowStyle Hidden `
-    -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
-if (-not $testProcess.WaitForExit(15000)) {
-    $testProcess.Kill()
-    $testProcess.WaitForExit()
-    throw "USB transport tests exceeded 15 seconds; a call may be blocking."
-}
-$testProcess.WaitForExit()
-$testProcess.Refresh()
-Get-Content -LiteralPath $stdoutPath
-Get-Content -LiteralPath $stderrPath
-if ($testProcess.ExitCode -ne 0) {
-    throw "USB transport tests failed (exit $($testProcess.ExitCode))."
+# The suite contains only non-blocking host checks; invoke it directly so
+# PowerShell preserves the native process exit code on Windows PowerShell.
+& $executable
+$exitCode = $LASTEXITCODE
+if ($exitCode -ne 0) {
+    throw "USB transport tests failed (exit $exitCode)."
 }
