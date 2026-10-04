@@ -35,7 +35,8 @@ pico_enable_stdio_usb(Hid_blinker_Pico 0)
 
 # Add the standard library to the build
 target_link_libraries(Hid_blinker_Pico
-        pico_stdlib)
+        pico_stdlib
+        pico_cyw43_arch_none)
 
 # Add the standard include files to the build
 target_include_directories(Hid_blinker_Pico PRIVATE
