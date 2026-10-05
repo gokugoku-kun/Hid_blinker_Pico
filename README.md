@@ -96,3 +96,32 @@ python pico_led.py all-off
 ```
 
 `0`は内蔵LED、`1`～`4`は外付けLEDです。複数台を接続した場合は、`--list`で表示された`PICOLED-...`を`--serial`に指定します。
+
+## CS+のIronPython 2.7から操作する
+
+CS+のPythonコンソールはIronPython 2.7なので、`hidapi`をCS+内に直接importしない。IronPython互換の[csplus_pico.py](csplus_pico.py)から、通常のCPython 3で`pico_led.py`を子プロセスとして実行する。
+
+`csplus_pico.py`先頭の`PYTHON_EXE`を、`hidapi`をインストールしたCPythonの実行ファイルへ合わせる。CS+のPythonコンソールでスクリプトのあるフォルダーを`sys.path`へ追加して使う。
+
+```python
+import sys
+sys.path.append(r"D:\Users\n9b01\Documents\Pico\work\Hid_blinker_Pico")
+import csplus_pico
+
+csplus_pico.list_devices()
+csplus_pico.on(0)                 # 内蔵LED
+csplus_pico.off(1)                # 外付けLED 1
+csplus_pico.blink(2, 500, 500)    # 外付けLED 2
+csplus_pico.status(2)
+csplus_pico.all_off()
+```
+
+複数台接続時は、先にシリアル番号を指定する。
+
+```python
+csplus_pico.configure(
+    r"C:\Program Files\Python39\python.exe",
+    serial="PICOLED-E6614864D3116E22")
+```
+
+Picoが未接続、またはCPythonの起動・HID操作に失敗した場合は、ブリッジがメッセージを表示して`False`を返す。CS+のIronPython処理自体は例外で終了しない。戻り値を確認したい処理では`if not csplus_pico.on(0):`のように扱う。
